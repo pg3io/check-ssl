@@ -1,77 +1,57 @@
 delay: 30
-ssl_delay: 3600
 thread: 2
 website:
   - url: https://www.lourdes-france.org
     search: 65108
     warning: 0.17
     ssl: true
-
-  - url: https://app.choosr.io/api/status
-    warning: 1
-    critical: 0.15
-    ssl: true
     tags:
-      - voxcracy
-
-  - url: https://api.rigolo.io/status
-    warning: 1
-    critical: 0.15
-    ssl: true
-
-  - url: https://www.groupecannatella.com
-    search: droits
-    warning: 0.3
-    critical: 0.5
-    ssl: true
+      - lourdes
 
   - url: https://www.davidetmarcel.com
     search: copyright
     warning: 0.5
     ssl: true
+    tags:
+      - evenement
+      - community manager
 
   - url: https://blog.pg3.io
     search: parseInt
     warning: 1
     ssl: true
-
-  - url: https://club.twinresto.fr/#!/connexion
-    search: UA-99372517-1
-    ssl: true
+    tags:
+      - pg3
 
   - url: https://www.leshotelsdenhaut.com/
     search: script.min.js
     warning: 0.3
     critical: 0.5
     ssl: true
+    tags:
+      - hotel
 
   - url: https://gumgum.com/
     search: UA-5159668-1
     warning: 0.5
     critical: 1
     ssl: true
+      - anime
 
   - url: https://partenaire-intermarche.geprocor.fr
     search: UA-116057600-1
     warning: 0.3
     critical: 0.6
     ssl: true
-
-  - url: https://api2.rigolo.io/login
-    search: footer
-    ssl: true
+      - intermarche
 
   - url: https://www.nicestartsup.com
     search: topLevelSections
     warning: 0.5
     critical: 1
     ssl: true
-
-  - url: https://extranet.psg.fr/ob-accounts/signin
-    search: meteor_runtime
-    warning: 0.4
-    critical: 0.6
-    ssl: true
+    tags :
+    - test
 
   - url: https://www.galimard.com
     search: FWP_HTTP
@@ -87,7 +67,3 @@ website:
     tags:
       - prod
       - pg3
-
-  - url: http://jenkins.len-medical.fr/login
-    search: Keep
-    ssl: false
