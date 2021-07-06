@@ -5,34 +5,49 @@
 [![Twitter](https://img.shields.io/twitter/follow/pg3io.svg?style=social)](https://twitter.com/intent/follow?screen_name=pg3io)
 
 Vérifie l'expiration d'un certificat SSL pour des urls donnés
-
+Comme pour crawlurl, ce service peut envoyer les données vers influxDB
 ## Input
 
 Lister vos urls dans un fichier "yml"
 
 ## Output
 
+### Sans InfluxDB
+
+dans le terminal :
 ```
 {'url': <URL>, 'expiration': <ssl_expiration_timestamp>, 'dns': [<DNS>]}
 ```
 
+### Avec InfluxDB
+sur la base de données :
+```
+measurement: ssl_check
+tag: host=${domaine}
+expiration: ${date d'expiration}
+delta: ${nombre de jours avant expiration}
+```
+
 ## Execution
 
+### Sans InfluxDB
 ```
 export LIST=./sources/list.yml
 python3 check_ssl.py
 ```
 
+### Avec InfluxDB
+```
+export LIST=./sources/list.yml
+export INFLUXDB-HOST=http://localhost:8086
+export INFLUXDB-BUCKET=bucket
+export INFLUXDB-TOKEN=token
+export INFLUXDB-ORG=org
+```
+
 ## Docker
 ```
-docker build -t pg3io/ssl:0.1 . --no-cache
-docker run -d -e LIST=/sources/list.yml --name checkSSL pg3io/ssl:0.1
-```
-
-ou simplement en récupérant l'image sur notre registry
-
-```
-docker run -d -e LIST=/sources/list.yml --name checkSSL registry.pg3.io:5000/pg3io/ssl:0.1
+docker-compose build --no-cache && docker-compose up -d
 ```
 
 # License
