@@ -1,15 +1,48 @@
 version: "3"
 
 services:
-  ssl:
-    image: registry.pg3.io:5000/pg3io/ssl:${VERSION:-latest}
+  db:
+    image: influxdb:2.0
+    ports:
+      - '8086:8086'
     volumes:
-#      - /data/ssl/:/sources/
-      - ./sources/:/sources/
+      - ./influxdbv2:/var/lib/influxdbv2
+    networks:
+      - app-to-db
+      - db-to-grafana
+    
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    volumes:
+      - './grafana:/var/lib/grafana'
+    networks:
+      - db-to-grafana
+    depends_on:
+      - db
+
+
+  ssl:
+    build: .
+    restart: on-failure:10
+    volumes:
+      - ./sources/:/sources
     environment:
       - "LIST=/sources/list.yml"
-#    logging:
-#      driver: gelf
-#      options:
-#        gelf-address: udp://127.0.0.1:12201
-#        tag: ssl.status
+    networks:
+      - app-to-db
+    environment:
+      - "INFLUXDB-HOST=http://db:8086"
+      - LIST=/sources/list.yml
+      - INFLUXDB-TOKEN=km5CRgVxbOHg6XATMfD1LQAK6Ur4IS9wRjqReS0ZkcjT3Y3bVaVq5x-gfuuQRAczmviojioa56xNdf1qHp9Wog==
+      - INFLUXDB-ORG=PG3
+      - INFLUXDB-BUCKET=check-ssl
+    depends_on:
+      - db
+      - grafana
+
+networks:
+  app-to-db:
+  db-to-grafana:

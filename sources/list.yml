@@ -11,7 +11,6 @@ website:
   - url: https://www.davidetmarcel.com
     search: copyright
     warning: 0.5
-    ssl: true
     tags:
       - evenement
       - community manager
