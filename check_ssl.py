@@ -3,11 +3,10 @@
 import os
 import ssl
 import json
-import influxdb_client
 import yaml
 from time import sleep, time
 import socket
-from datetime import datetime, date
+from datetime import datetime, timedelta
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -75,7 +74,7 @@ def connect_to_influxdb():
 
 
 def insert_to_influxdb(write_api, influxdb_connected, hostname, expiration, dns, delta, tags):
-    new_delta = f'{delta}'.split()[0]
+    new_delta = delta.days
     sequence = [
         f'ssl_check,host={hostname} expiration="{expiration}",dns="{dns}",delta={new_delta}'
     ]
@@ -110,16 +109,20 @@ def main():
                 port = '443'
                 hostname = format_url(base_url)
                 context = ssl.create_default_context()
-                with socket.create_connection((hostname, port)) as sock:
-                    with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-                        data = ssock.getpeercert()
-
-                expiration = datetime.utcfromtimestamp(ssl.cert_time_to_seconds(data['notAfter']))
+                try:
+                    with socket.create_connection((hostname, port)) as sock:
+                        with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                            data = ssock.getpeercert()
+                except ssl.SSLCertVerificationError:
+                    expiration = datetime.now() - timedelta(days=1)
+                    dns = ""
+                else:
+                    expiration = datetime.utcfromtimestamp(ssl.cert_time_to_seconds(data['notAfter']))
+                    dns = str(data['subjectAltName'])
+                    dns = dns.replace('(', '').replace(')', '').replace("'", '').replace('DNS', '').replace(' ', '')
+                    dns = dns[1:]
+                    dns = dns.split(',,')
                 delta = expiration - today
-                dns = str(data['subjectAltName'])
-                dns = dns.replace('(', '').replace(')', '').replace("'", '').replace('DNS', '').replace(' ', '')
-                dns = dns[1:]
-                dns = dns.split(',,')
                 try:
                     tags = url['tags']
                 except:
