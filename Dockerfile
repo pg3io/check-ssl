@@ -6,7 +6,7 @@ RUN apk add --no-cache --virtual build-dependencies build-base gcc wget git && p
 
 COPY  check_ssl.py /usr/src/app/main.py
 RUN mkdir /sources && touch /sources/list.yml
-COPY ./sources/list.yml /sources/list.yml
+COPY /data/crawl/list.yml /sources/list.yml
 ENV LIST="/sources/list.yml"
 VOLUME ["/sources/"]
 
